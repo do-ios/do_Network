@@ -227,52 +227,38 @@ static do_Network_SM      * theInstance = nil;
 {
     //自己的代码实现
     doInvokeResult *_invokeResult = [parms objectAtIndex:2];
-    NSArray *children = [[[[UIApplication sharedApplication]  valueForKeyPath:@"statusBar"]valueForKeyPath:@"foregroundView"]subviews];
-    NSString *state = [[NSString alloc]init];
-    int netType = 0;
-    //获取到网络返回码
-    for (id child in children) {
-        if ([child isKindOfClass:NSClassFromString(@"UIStatusBarDataNetworkItemView")]) {
-            //获取到状态栏
-            netType = [[child valueForKeyPath:@"dataNetworkType"]intValue];
-            if (netType == 0) {
-                state = @"none";
-                //无网模式
-                break;
-            }
-            else if (netType == 1)
-            {
-                state = @"2G";
-                break;
-            }
-            else if (netType == 2)
-            {
-                state = @"3G";
-                break;
-            }
-            else if (netType == 3)
-            {
-                state = @"4G";
-                break;
-            }
-            else if (netType == 5)
-            {
-                state = @"wifi";
-                break;
-            }
-            else
-            {
-                state = @"unknown";
-                break;
-            }
-        }
-        else
-        {
+    doReachability*reach=[doReachability reachabilityWithHostName:@"www.baidu.com"];
+    NSString *state = @"none";
+    switch ([reach currentReachabilityStatus]) {
+        case NotReachable: {
             state = @"none";
+            break;
+        }
+        case ReachableViaWiFi: {
+            state = @"wifi";
+            break;
+        }
+        case kReachableVia2G: {
+            state = @"2G";
+            break;
+        }
+        case kReachableVia3G: {
+            state = @"3G";
+            break;
+        }
+        case kReachableVia4G: {
+            state = @"4G";
+            break;
+        }
+        default: {
+            state = @"unknown";
+            break;
         }
     }
     [_invokeResult SetResultText:state];
 }
+
+
 
 - (void)openWifiSetting:(NSArray *)parms
 {
